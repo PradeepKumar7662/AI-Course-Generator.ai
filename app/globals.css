@@ -1,0 +1,251 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+   
+    --foreground: #000000;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+    
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+
+
+
+
+/* Premium AI Course Generator Background */
+body.animated-grid-bg {
+  min-height: 100vh;
+  background-color: #ebe5f0;
+  background-image:
+    linear-gradient(rgba(99, 102, 241, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.07) 1px, transparent 1px),
+    radial-gradient(ellipse at 0% 0%, rgba(59, 130, 246, 0.20), transparent 38%),
+    radial-gradient(ellipse at 100% 15%, rgba(168, 85, 247, 0.16), transparent 35%),
+    radial-gradient(ellipse at 100% 100%, rgba(6, 182, 212, 0.18), transparent 38%),
+    radial-gradient(ellipse at 0% 100%, rgba(217, 70, 239, 0.10), transparent 32%);
+  background-size:
+    40px 40px,
+    40px 40px,
+    160% 160%,
+    160% 160%,
+    160% 160%,
+    160% 160%;
+  background-position:
+    0 0, 0 0, 0% 0%, 100% 0%, 100% 100%, 0% 100%;
+  background-repeat:
+    repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  animation: premiumGlow 16s ease-in-out infinite alternate;
+}
+
+@keyframes premiumGlow {
+  from {
+    background-position:
+      0 0, 0 0, 0% 0%, 100% 0%, 100% 100%, 0% 100%;
+  }
+  to {
+    background-position:
+      0 0, 0 0, 15% 20%, 85% 15%, 85% 85%, 15% 85%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.animated-grid-bg {
+    animation: none;
+  }
+}
+
+
+/* My AI Courses section animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[fadeInUp_0\.6s_ease-out_both\] {
+    animation: none !important;
+  }
+}
+
+
+/* ===== Premium Dashboard Animations ===== */
+
+@keyframes dashboardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dashboardGlow {
+  0%, 100% {
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.10);
+  }
+  50% {
+    box-shadow: 0 12px 32px rgba(139, 92, 246, 0.18);
+  }
+}
+
+.dashboard-enter {
+  animation: dashboardEnter 0.65s ease-out both;
+}
+
+.dashboard-delay-1 {
+  animation-delay: 100ms;
+}
+
+.dashboard-delay-2 {
+  animation-delay: 200ms;
+}
+
+.dashboard-delay-3 {
+  animation-delay: 300ms;
+}
+
+.dashboard-card {
+  min-width: 0;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  transition:
+    transform 250ms ease,
+    border-color 250ms ease,
+    box-shadow 250ms ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(167, 139, 250, 0.65);
+  box-shadow: 0 12px 28px rgba(79, 70, 229, 0.10);
+}
+
+.dashboard-primary-btn {
+  background: linear-gradient(110deg, #4f46e5, #7c3aed);
+  color: white;
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.23);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.dashboard-primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.32);
+}
+
+@media (max-width: 640px) {
+  .dashboard-card:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-enter,
+  .dashboard-delay-1,
+  .dashboard-delay-2,
+  .dashboard-delay-3 {
+    animation: none;
+  }
+
+  .dashboard-card,
+  .dashboard-primary-btn {
+    transition: none;
+  }
+}
+
+.chapter-reveal.chapter-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
