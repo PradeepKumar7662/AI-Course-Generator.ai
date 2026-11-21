@@ -118,30 +118,30 @@ function CourseBasicInfo({ course, refreshData, edit = true }) {
             Structured learning, one chapter at a time
           </div>
 
-          <div className="mt-7 flex w-full flex-wrap items-center gap-3">
-            {!edit && (
-              <Link
-                href={`/course/${course?.courseId}/start`}
-                className="w-full sm:w-auto"
-              >
-                <Button className="h-12 w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-6 text-white shadow-lg shadow-violet-200 transition-all hover:-translate-y-0.5 hover:from-violet-700 hover:to-indigo-700 sm:w-auto dark:shadow-none">
-                  <Play size={17} className="mr-2 fill-current" />
-                  Start Learning
-                  <ArrowRight
-                    size={17}
-                    className="ml-3 transition-transform group-hover:translate-x-1"
-                  />
-                </Button>
-              </Link>
-            )}
+        
+<div className="mt-7 flex w-full flex-wrap items-center gap-3">
+  <Link
+    href={`/course/${course?.courseId}/start`}
+    className="w-full sm:w-auto"
+  >
+    <Button className="h-12 w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-6 text-white shadow-lg shadow-violet-200 transition-all hover:-translate-y-0.5 hover:from-violet-700 hover:to-indigo-700 sm:w-auto dark:shadow-none">
+      <Play size={17} className="mr-2 fill-current" />
+      Start Learning
+      <ArrowRight
+        size={17}
+        className="ml-3 transition-transform group-hover:translate-x-1"
+      />
+    </Button>
+  </Link>
 
-            {edit && (
-              <EditCourseBasicinfo
-                course={course}
-                refreshData={() => refreshData?.(true)}
-              />
-            )}
-          </div>
+  {edit && (
+    <EditCourseBasicinfo
+      course={course}
+      refreshData={() => refreshData?.(true)}
+    />
+  )}
+</div>
+
         </div>
 
         {/* Course banner */}

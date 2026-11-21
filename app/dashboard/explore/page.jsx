@@ -65,11 +65,10 @@ const Explore = () => {
         Explore More Projects!
       </h2>
 
-      <p>
-        Explore more projects with{" "}
-        <span className="font-bold text-purple-800">AI</span>{" "}
-        by other users.
-      </p>
+  <p>
+  Explore your AI-generated courses and continue learning with{" "}
+  <span className="font-bold text-purple-800">AI</span>.
+</p>
 
       {loading && (
         <p className="mt-5">Loading courses...</p>

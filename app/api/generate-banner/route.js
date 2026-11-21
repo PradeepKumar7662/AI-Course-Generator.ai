@@ -50,9 +50,8 @@ export async function POST(request) {
         ? description.trim().slice(0, 250)
         : "";
 
-    const apiUrl =
-      `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/`;
-
+   const apiUrl =
+  `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/`;
     // STEP 1: AI understands the course and creates an image prompt.
 
     const textResponse = await fetch(

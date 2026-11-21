@@ -16,6 +16,14 @@ import { UserInputContext } from "../_context/UserInputContext";
 import LoadingDialog from "./_components/LoadingDialog";
 import { useUser } from "@clerk/nextjs";
 
+// Firebase Storage
+import { storage } from "@/configs/firebaseconfig";
+import {
+  ref,
+  uploadString,
+  getDownloadURL,
+} from "firebase/storage";
+
 function CreateCourse() {
   const StepperOption = [
     { id: 1, name: "Category", icon: <FaServicestack /> },
@@ -33,12 +41,13 @@ function CreateCourse() {
 
   const { user } = useUser();
 
-  // Generate the course banner and save it.
+  // Generate course banner and upload directly to Firebase Storage.
   const GenerateCourseBanner = async (
     topic,
     category,
     description
   ) => {
+    // Step 1: Generate image using Cloudflare AI.
     const response = await fetch("/api/generate-banner", {
       method: "POST",
       headers: {
@@ -54,7 +63,6 @@ function CreateCourse() {
     const responseText = await response.text();
 
     console.log("Banner API status:", response.status);
-    console.log("Banner API response:", responseText);
 
     let data;
 
@@ -62,49 +70,53 @@ function CreateCourse() {
       data = JSON.parse(responseText);
     } catch {
       throw new Error(
-        `Generate banner API returned invalid JSON. Status: ${response.status}`
+        `Banner API returned invalid JSON. Status: ${response.status}`
       );
     }
 
-    if (!response.ok || !data.image) {
+    if (
+      !response.ok ||
+      typeof data?.image !== "string" ||
+      !data.image
+    ) {
       throw new Error(
-        data.error || "Cloudflare banner generation failed"
+        data?.error || "Cloudflare banner generation failed."
       );
     }
 
-    // Save the generated image.
-    const saveResponse = await fetch("/api/save-banner", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        image: `data:image/jpeg;base64,${data.image}`,
-      }),
-    });
+    // Step 2: Prepare the generated image.
+    const contentType = data.contentType || "image/jpeg";
 
-    const saveText = await saveResponse.text();
+    const imageData = `data:${contentType};base64,${data.image}`;
 
-    console.log("Save banner status:", saveResponse.status);
-    console.log("Save banner response:", saveText);
+    // Step 3: Create a unique Firebase Storage file path.
+    const fileName = `${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2)}.jpg`;
 
-    let saveData;
+    const storageRef = ref(
+      storage,
+      `course-banners/${user.id}/${fileName}`
+    );
 
-    try {
-      saveData = JSON.parse(saveText);
-    } catch {
-      throw new Error(
-        `Save banner API returned invalid JSON. Status: ${saveResponse.status}`
-      );
-    }
+    // Step 4: Upload image to Firebase Storage.
+    const uploadResult = await uploadString(
+      storageRef,
+      imageData,
+      "data_url",
+      {
+        contentType,
+      }
+    );
 
-    if (!saveResponse.ok || !saveData.url) {
-      throw new Error(
-        saveData.error || "Unable to save generated banner"
-      );
-    }
+    // Step 5: Get the permanent download URL.
+    const downloadURL = await getDownloadURL(
+      uploadResult.ref
+    );
 
-    return saveData.url;
+    console.log("Course banner uploaded successfully.");
+
+    return downloadURL;
   };
 
   useEffect(() => {
@@ -149,7 +161,7 @@ function CreateCourse() {
     return false;
   };
 
-  // Save the course layout in the database.
+  // Save course layout in the database.
   const SaveCourseLayoutInDb = async (
     courseLayout,
     courseBanner = "/images.png"
@@ -194,11 +206,11 @@ function CreateCourse() {
     console.log("Course saved successfully:", data.courseId);
     console.log("Navigating to:", courseUrl);
 
-    // Force navigation to the Course Layout page.
+    // Navigate to Course Layout page.
     window.location.assign(courseUrl);
   };
 
-  // Generate the course layout.
+  // Generate course layout.
   const GeneraterCourseLayout = async () => {
     if (!user?.id) {
       alert("Please sign in before creating a course.");
@@ -239,7 +251,7 @@ function CreateCourse() {
 
       if (!response.ok) {
         throw new Error(
-          data.error || "Course generation failed"
+          data.error || "Course generation failed."
         );
       }
 
@@ -249,7 +261,7 @@ function CreateCourse() {
         );
       }
 
-      // Step 2: Generate banner.
+      // Step 2: Generate and upload course banner.
       let courseBanner = "/images.png";
 
       try {
@@ -258,10 +270,16 @@ function CreateCourse() {
           userCourseInput?.category,
           userCourseInput?.description
         );
+
+        console.log("Course banner URL:", courseBanner);
       } catch (bannerError) {
         console.error(
-          "Banner generation failed:",
+          "Banner generation or upload failed:",
           bannerError
+        );
+
+        alert(
+          "Course banner could not be generated. The course will be saved with the default image."
         );
       }
 
@@ -286,6 +304,7 @@ function CreateCourse() {
 
   return (
     <main className="relative isolate min-h-screen overflow-hidden rounded-2xl bg-gradient-to-br from-slate-50 via-white to-indigo-50/80 text-slate-900">
+
       {/* Background grid and glow */}
       <div
         aria-hidden="true"

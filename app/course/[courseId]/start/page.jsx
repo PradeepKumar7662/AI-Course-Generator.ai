@@ -49,7 +49,7 @@ export default function CourseStart() {
         setError("");
         setChapterContent(null);
 
-        const url = `/api/course/${courseId}/chapters/${chapterIndex}`;
+        const url = `/api/course/${courseId}/chapter/${chapterIndex}`;
 
         let response = await fetch(url, {
           method: "GET",
