@@ -16,13 +16,7 @@ import { UserInputContext } from "../_context/UserInputContext";
 import LoadingDialog from "./_components/LoadingDialog";
 import { useUser } from "@clerk/nextjs";
 
-// Firebase Storage
-import { storage } from "@/configs/firebaseconfig";
-import {
-  ref,
-  uploadString,
-  getDownloadURL,
-} from "firebase/storage";
+
 
 function CreateCourse() {
   const StepperOption = [
@@ -41,83 +35,47 @@ function CreateCourse() {
 
   const { user } = useUser();
 
-  // Generate course banner and upload directly to Firebase Storage.
-  const GenerateCourseBanner = async (
-    topic,
-    category,
-    description
-  ) => {
-    // Step 1: Generate image using Cloudflare AI.
-    const response = await fetch("/api/generate-banner", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        topic,
-        category,
-        description,
-      }),
-    });
+  // Cloudflare banner generation uploade
+const GenerateCourseBanner = async (
+  topic,
+  category,
+  description
+) => {
+  const response = await fetch("/api/generate-banner", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      topic,
+      category,
+      description,
+    }),
+  });
 
-    const responseText = await response.text();
+  const responseText = await response.text();
 
-    console.log("Banner API status:", response.status);
+  let data;
 
-    let data;
-
-    try {
-      data = JSON.parse(responseText);
-    } catch {
-      throw new Error(
-        `Banner API returned invalid JSON. Status: ${response.status}`
-      );
-    }
-
-    if (
-      !response.ok ||
-      typeof data?.image !== "string" ||
-      !data.image
-    ) {
-      throw new Error(
-        data?.error || "Cloudflare banner generation failed."
-      );
-    }
-
-    // Step 2: Prepare the generated image.
-    const contentType = data.contentType || "image/jpeg";
-
-    const imageData = `data:${contentType};base64,${data.image}`;
-
-    // Step 3: Create a unique Firebase Storage file path.
-    const fileName = `${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2)}.jpg`;
-
-    const storageRef = ref(
-      storage,
-      `course-banners/${user.id}/${fileName}`
+  try {
+    data = JSON.parse(responseText);
+  } catch {
+    throw new Error(
+      `Banner API returned invalid JSON. Status: ${response.status}`
     );
+  }
 
-    // Step 4: Upload image to Firebase Storage.
-    const uploadResult = await uploadString(
-      storageRef,
-      imageData,
-      "data_url",
-      {
-        contentType,
-      }
+  if (!response.ok || !data.url) {
+    throw new Error(
+      data.error || "Cloudflare banner generation failed."
     );
+  }
 
-    // Step 5: Get the permanent download URL.
-    const downloadURL = await getDownloadURL(
-      uploadResult.ref
-    );
+  console.log("Generated banner URL:", data.url);
 
-    console.log("Course banner uploaded successfully.");
+  return data.url;
+};
 
-    return downloadURL;
-  };
 
   useEffect(() => {
     console.log("User course input:", userCourseInput);

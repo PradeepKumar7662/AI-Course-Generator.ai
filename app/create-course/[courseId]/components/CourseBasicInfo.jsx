@@ -6,8 +6,6 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import EditCourseBasicinfo from "./EditCourseBasicinfo";
 import { PiPuzzlePieceFill } from "react-icons/pi";
-import { storage } from "@/configs/firebaseconfig";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -27,50 +25,95 @@ function CourseBasicInfo({ course, refreshData, edit = true }) {
     setSelectedFile("");
   }, [course?.courseBanner]);
 
-  const onFileSelected = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  
+const onFileSelected = async (event) => {
+  const input = event.currentTarget;
+  const file = input.files?.[0];
 
-    if (!file.type.startsWith("image/")) {
-      setUploadError("Please select a valid image file.");
-      return;
-    }
+  if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      setUploadError("Image size must be less than 5 MB.");
-      return;
-    }
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ];
 
-    setUploading(true);
-    setUploadError("");
+  if (!allowedTypes.includes(file.type)) {
+    setUploadError("Please select a JPEG, PNG or WEBP image.");
+    input.value = "";
+    return;
+  }
 
-    const previewUrl = URL.createObjectURL(file);
-    setSelectedFile(previewUrl);
+  if (file.size > 4 * 1024 * 1024) {
+    setUploadError("Image size must be less than 4 MB.");
+    input.value = "";
+    return;
+  }
+
+  if (!course?.courseId) {
+    setUploadError("Course ID is missing.");
+    input.value = "";
+    return;
+  }
+
+  setUploading(true);
+  setUploadError("");
+
+  const previewUrl = URL.createObjectURL(file);
+  setSelectedFile(previewUrl);
+
+  try {
+    const formData = new FormData();
+
+    formData.append("file", file);
+    formData.append("courseId", course.courseId);
+
+    const response = await fetch("/api/save-banner", {
+      method: "POST",
+      body: formData,
+    });
+
+    const responseText = await response.text();
+
+    let data;
 
     try {
-      const fileName = `${Date.now()}-${file.name.replace(
-        /[^a-zA-Z0-9._-]/g,
-        "_"
-      )}`;
-
-      const storageRef = ref(storage, `ai-course/${fileName}`);
-      await uploadBytes(storageRef, file);
-
-      const downloadURL = await getDownloadURL(storageRef);
-      setSelectedFile(downloadURL);
-
-      // Next: save downloadURL to the course record through your update API.
-      console.log("Image uploaded successfully:", downloadURL);
-    } catch (error) {
-      console.error("Image upload failed:", error);
-      setUploadError("Image upload failed. Please try again.");
-      setSelectedFile("");
-      URL.revokeObjectURL(previewUrl);
-    } finally {
-      setUploading(false);
-      event.target.value = "";
+      data = JSON.parse(responseText);
+    } catch {
+      throw new Error(
+        `Upload API returned invalid JSON. Status: ${response.status}`
+      );
     }
-  };
+
+    if (!response.ok || !data.url) {
+      throw new Error(
+        data.error || "Image upload failed."
+      );
+    }
+
+    setSelectedFile(data.url);
+
+    URL.revokeObjectURL(previewUrl);
+
+    console.log("Banner updated:", data.url);
+
+    await refreshData?.(true);
+
+  } catch (error) {
+    console.error("Image upload failed:", error);
+
+    setSelectedFile("");
+    URL.revokeObjectURL(previewUrl);
+
+    setUploadError(
+      error.message || "Image upload failed. Please try again."
+    );
+
+  } finally {
+    setUploading(false);
+    input.value = "";
+  }
+};
 
   const courseName =
     course?.courseOutput?.["Course Name"] ||

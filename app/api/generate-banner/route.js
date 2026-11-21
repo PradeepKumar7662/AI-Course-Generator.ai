@@ -1,6 +1,7 @@
 
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import cloudinary from "@/configs/cloudinary";
 
 export const runtime = "nodejs";
 
@@ -189,11 +190,24 @@ photographic image prompt for this course.
       );
     }
 
-    return NextResponse.json({
-      image: imageResult.result.image,
-      contentType: "image/jpeg",
-      prompt: imagePrompt,
-    });
+    
+// Upload generated AI image directly to Cloudinary
+const cloudinaryResult = await cloudinary.uploader.upload(
+  `data:image/jpeg;base64,${imageResult.result.image}`,
+  {
+    folder: `ai-course-banners/generated/${userId}`,
+    resource_type: "image",
+  }
+);
+
+console.log("AI banner uploaded:", cloudinaryResult.secure_url);
+
+return NextResponse.json({
+  url: cloudinaryResult.secure_url,
+  contentType: "image/jpeg",
+  prompt: imagePrompt,
+});
+
 
   } catch (error) {
     console.error("GENERATE BANNER ERROR:", error);
