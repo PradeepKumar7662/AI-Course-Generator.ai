@@ -6,6 +6,18 @@ An AI-powered learning platform that transforms any topic into a structured lear
 
 Create personalized courses, explore your learning materials, and manage your courses with the power of Artificial Intelligence.
 
+
+
+[🌐 Live Demo](https://ai-course-generatorai.vercel.app/)
+
+---
+
+## 🌐 Live Demo
+
+🔗 **Live Application:** [https://ai-course-generatorai.vercel.app/](https://ai-course-generatorai.vercel.app/)
+
+
+
 ---
 
 ## ✨ What Makes It Special?
